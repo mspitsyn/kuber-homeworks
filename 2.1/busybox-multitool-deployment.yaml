@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shared-volume-deployment
+  namespace: netology
+  labels:
+    app: shared-volume
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shared-volume
+  template:
+    metadata:
+      labels:
+        app: shared-volume
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ['sh', '-c', 'while true; do echo "$(date) - Test" >> /data/test; sleep 5; done']
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+      - name: multitool
+        image: wbitt/network-multitool:latest
+        command: ['sh', '-c', 'tail -f /data/test']
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+        ports:
+        - containerPort: 8080
+        env:
+        - name: HTTP_PORT
+          value: "7080"
+      volumes:
+      - name: shared-volume
+        emptyDir: {}
