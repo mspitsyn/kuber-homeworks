@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-html
+  namespace: netology
+data:
+  index.html: |
+    <!DOCTYPE html>  
+    <html>  
+    <head>  
+      <title>Простая веб-страница</title>  
+    </head>  
+    <body>  
+      <h1>Подключено к Nginx с помощью ConfigMap</h1>  
+    </body>  
+    </html> 
