@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-content
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Страница из ConfigMap</title>
+    </head>
+    <body>
+      <h1>Привет от Kubernetes!</h1>
+      <p>Это веб-страница, настроенная через ConfigMap</p>
+      <p>Время сервера: <?php echo date('Y-m-d H:i:s'); ?></p>
+    </body>
+    </html>
+  default.conf: |
+    server {
+        listen 80;
+        server_name _;
+        
+        location / {
+            root /usr/share/nginx/html;
+            index index.html index.htm;
+        }
+        
+        location /status {
+            stub_status on;
+            access_log off;
+        }
+    }
