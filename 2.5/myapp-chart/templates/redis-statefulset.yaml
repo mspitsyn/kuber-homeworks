@@ -1,0 +1,48 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-redis
+spec:
+  replicas: {{ .Values.redis.replicaCount }}
+  serviceName: {{ .Release.Name }}-redis
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-redis
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-redis
+    spec:
+      containers:
+      - name: redis
+        image: {{ .Values.redis.image }}
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        {{- if .Values.redis.persistence.enabled }}
+        hostPath:
+          path: {{ .Values.redis.persistence.hostPath }}
+          type: DirectoryOrCreate
+        {{- end }}
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-redis
+spec:
+  type: {{ .Values.redis.service.type }}
+  ports:
+  - port: {{ .Values.redis.service.port }}
+    targetPort: 6379
+    {{- if eq .Values.redis.service.type "NodePort" }}
+    nodePort: {{ .Values.redis.service.nodePort }}
+    {{- end }}
+  selector:
+    app: {{ .Release.Name }}-redis
